@@ -1,7 +1,8 @@
 from process import Process
 import sys
-from scheduler import create_all_schedulers
+from algorithms import create_all_schedulers
 from simulator import Simulator
+
 
 def read_processes_from_file(filename):
     """Dosyadan processleri okur ve Process listesi döndürür."""
