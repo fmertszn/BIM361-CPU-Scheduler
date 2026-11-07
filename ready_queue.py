@@ -1,5 +1,6 @@
 from collections import deque
 
+
 class ReadyQueue:
     """CPU’yu bekleyen süreçlerin hazır kuyruğu."""
     def __init__(self):

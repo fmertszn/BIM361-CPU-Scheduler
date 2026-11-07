@@ -1,6 +1,7 @@
 import copy
 from gantt import GanttChart
 
+
 class SimulationResult:
     """Bir algoritmanın sonuçları ve ortalamaları."""
     def __init__(self, algorithm_name, processes, gantt_chart):
