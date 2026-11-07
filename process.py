@@ -2,12 +2,12 @@ class Process:
     """Sürecin girdi bilgilerini ve sonuçlari tutan sinif."""
     
     def __init__(self, process_id, arrival_time, burst_time, priority):
-        self.process_id = process_id #Sürecin adi
-        self.arrival_time = int(arrival_time) #kuyruğa geldiği zaman
+        self.process_id = process_id 
+        self.arrival_time = int(arrival_time) 
         self.burst_time = int(burst_time) #CPU'da çalışma süresi
         self.priority = int(priority) #Öncelik değeri
         
-        self.remaining_time = self.burst_time #Kalan süre - başta burst_time ile aynı
+        self.remaining_time = self.burst_time 
         #Henüz çalışmadığı için her ikisi de None
         self.start_time = None 
         self.finish_time = None 
@@ -24,5 +24,5 @@ class Process:
         
     def __str__(self):
         return (f"[{self.process_id} | Geliş: {self.arrival_time} | "
-                f"Süre: {self.burst_time} | Öncelik: {self.priority}]") #Nesne yazdırılınca burası çalışır.
+                f"Süre: {self.burst_time} | Öncelik: {self.priority}]") 
         
