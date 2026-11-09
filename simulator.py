@@ -1,5 +1,6 @@
 import copy
 from gantt import GanttChart
+from metrics import calculate_averages
 
 
 class SimulationResult:
@@ -29,7 +30,31 @@ class Simulator:
         scheduler.reset()
         gantt_chart = GanttChart()
 
-        raise NotImplementedError("Simulator.run")
+        current_time = 0
+        running = None
+        while not self.all_finished(processes) and current_time < 50:
+            self.add_arrivals(processes, scheduler, current_time)
+            
+            if running is None:
+                running = scheduler.select_next(current_time)
+                if running is not None and running.start_time is None:
+                    running.start_time = current_time
+            
+            if running is not None:
+                running.remaining_time -= 1
+                gantt_chart.add(running.process_id, current_time, current_time + 1)
+            else:
+                gantt_chart.add(GanttChart.IDLE, current_time, current_time + 1)
+                
+            current_time += 1
+            
+            if running is not None and running.remaining_time == 0:
+                running.finish_time = current_time
+                running = None
+                
+        result = SimulationResult(scheduler.name, processes, gantt_chart)
+        calculate_averages(result)
+        return result
 
     @staticmethod
     def add_arrivals(processes, scheduler, current_time):
