@@ -1,5 +1,6 @@
 import copy
 from gantt import GanttChart
+from metrics import calculate_averages
 
 
 class SimulationResult:
@@ -51,7 +52,9 @@ class Simulator:
                 running.finish_time = current_time
                 running = None
                 
-        return SimulationResult(scheduler.name, processes, gantt_chart)
+        result = SimulationResult(scheduler.name, processes, gantt_chart)
+        calculate_averages(result)
+        return result
 
     @staticmethod
     def add_arrivals(processes, scheduler, current_time):
