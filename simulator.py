@@ -63,6 +63,10 @@ class Simulator:
             elif running is not None and quantum is not None and quantum_used == quantum:
                 scheduler.add_process(running)
                 running = None
+                
+            if running is not None and scheduler.should_preempt(running, current_time):
+                scheduler.add_process(running)
+                running = None
 
         result = SimulationResult(scheduler.name, processes, gantt_chart)
         calculate_averages(result)
