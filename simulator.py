@@ -26,6 +26,7 @@ class Simulator:
         self.processes = processes
 
     def run(self, scheduler):
+        """Algoritmayı süreçlerin kopyası üzerinde çalıştırır, orijinal liste bozulmaz."""
         processes = copy.deepcopy(self.processes)
         for p in processes:
             p.reset()
@@ -36,10 +37,11 @@ class Simulator:
         running = None
         quantum_used = 0
         quantum = scheduler.get_time_quantum()
+        time_limit = max(p.arrival_time for p in processes) + sum(p.burst_time for p in processes)
 
         self.add_arrivals(processes, scheduler, current_time)
 
-        while not self.all_finished(processes) and current_time < 50:
+        while not self.all_finished(processes) and current_time <= time_limit:
 
             if running is None:
                 running = scheduler.select_next(current_time)
@@ -68,6 +70,9 @@ class Simulator:
                 scheduler.add_process(running)
                 running = None
 
+        if not self.all_finished(processes):
+            raise RuntimeError(f"{scheduler.name}: simülasyon bitmedi, algoritma hatalı olabilir")
+        
         result = SimulationResult(scheduler.name, processes, gantt_chart)
         calculate_averages(result)
         return result
