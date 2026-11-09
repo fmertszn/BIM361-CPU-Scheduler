@@ -1,50 +1,49 @@
 from scheduler import Scheduler
 
 
-class RoundRobinScheduler(Scheduler):
-    def __init__(self, time_quantum=4):
+class PriorityScheduler(Scheduler):
+
+    def __init__(self, preemptive=False):
         super().__init__()
-        if time_quantum <= 0:
-            raise ValueError("Quantum pozitif olmalı")
-        self.time_quantum = time_quantum
-        self.name = f"Round Robin (q={time_quantum})"
+        self.preemptive = preemptive
+        self.name = "Priority (kesintili)" if preemptive else "Priority"
+
     def reset(self):
         """Hazır kuyruğunu sıfırlar (her simülasyon başında çağrılır)."""
         self.ready_queue.clear()
 
     def get_time_quantum(self):
-        """Simülatörün kesme kararı için kullandığı zaman dilimini döner."""
-        return self.time_quantum
+        """Priority algoritması zaman dilimi (quantum) kullanmaz."""
+        return None
 
     def add_process(self, process):
-        """Yeni gelen (veya kuantumu biten) süreci kuyruğun sonuna ekler."""
+        """Yeni gelen süreci hazır kuyruğuna ekler."""
         self.ready_queue.add(process)
 
     def select_next(self, current_time):
-        """Kuyruktan sıradaki ilk süreci seçer (FIFO sırasıyla).
+        """Kuyruktan öncelik değeri en düşük (en yüksek öncelik) süreci seçer.
 
-        Round Robin'de süreçler geliş sırasına göre işlendiğinden
-        her zaman kuyruğun başındaki süreç seçilir.
+        Eşitlik durumunda geliş zamanı (arrival_time), ardından süreç kimliği
+        (process_id) kullanılarak deterministik seçim yapılır.
         """
         if self.ready_queue.is_empty():
             return None
-        return self.ready_queue.pop_first()
+        return self.ready_queue.pop_min(
+            key=lambda p: (p.priority, p.arrival_time, p.process_id)
+        )
 
     def should_preempt(self, running_process, current_time):
-        """Round Robin kesmeyi quantum dolduğunda simülatör yapar; bu metod hep False döner.
+        """Kesinti gerekip gerekmediğini kontrol eder.
 
-        Simülatör ``get_time_quantum()`` ile quantum değerini alarak
-        dolduğunda süreci kuyruğa geri ekler. Dolayısıyla bu metoda
-        gerek yoktur.
+        Yalnızca ``preemptive=True`` modunda aktiftir. Hazır kuyrukta
+        çalışan süreçten daha yüksek öncelikli (daha düşük priority değeri)
+        bir süreç varsa kesinti yapılır.
         """
-        return False
-
-
-    def should_preempt(self, running_process, current_time):
-        """Round Robin kesmeyi quantum dolduğunda simülatör yapar; bu metod hep False döner.
-
-        Simülatör ``get_time_quantum()`` ile quantum değerini alarak
-        dolduğunda süreci kuyruğa geri ekler. Dolayısıyla bu metoda
-        gerek yoktur.
-        """
-        return False
+        if not self.preemptive:
+            return False
+        if self.ready_queue.is_empty():
+            return False
+        best = self.ready_queue.peek_min(
+            key=lambda p: (p.priority, p.arrival_time, p.process_id)
+        )
+        return best.priority < running_process.priority
