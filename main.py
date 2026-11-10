@@ -1,7 +1,6 @@
 from process import Process
 import sys
-from algorithms import create_all_schedulers
-from simulator import Simulator
+from analysis import run_all
 
 
 def read_processes_from_file(filename):
@@ -75,22 +74,14 @@ def main():
         print(p)
     print()
 
-    simulator = Simulator(processes)
-    results = []
-    for scheduler in create_all_schedulers(time_quantum):
-        try:
-            result = simulator.run(scheduler)
-        except NotImplementedError:
-            print(f"[{scheduler.name}] henüz yazılmadı (TODO)")
-            continue
-        results.append(result)
+    results = run_all(processes, time_quantum)
+    for result in results:
         print(f"\n=== {result.algorithm_name} ===")
         print(result.gantt_chart)
         print_process_table(result)
-
-    if results:
-        print()
-        print_comparison(results)
+    
+    print()
+    print_comparison(results)
 
 
 if __name__ == "__main__":
