@@ -1,6 +1,6 @@
 from process import Process
 import sys
-from analysis import run_all
+from analysis import run_all, best_algorithm, save_results_csv
 
 
 def read_processes_from_file(filename):
@@ -82,7 +82,13 @@ def main():
     
     print()
     print_comparison(results)
+    
+    best = best_algorithm(results)
+    print(f"\nEn düşük ortalama bekleme süresi: {best.algorithm_name} ({best.avg_waiting_time:.2f})")
 
+    if len(sys.argv) > 3:
+        save_results_csv(results, sys.argv[3])
+        print(f"Sonuçlar kaydedildi: {sys.argv[3]}")
 
 if __name__ == "__main__":
     main()
